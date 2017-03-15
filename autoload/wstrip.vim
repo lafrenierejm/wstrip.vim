@@ -1,32 +1,8 @@
 let s:pattern = '\s\+$'
 
-
 function! s:cleanable() abort
   return buflisted(bufnr('%')) && empty(&buftype)
 endfunction
-
-
-function! s:is_git_repo() abort
-  let last_dir = ''
-  let cur_dir = expand('%:p:h')
-
-  while last_dir != cur_dir
-    if isdirectory(cur_dir.'/.git')
-      return 1
-    endif
-    let last_dir = cur_dir
-    let cur_dir = fnamemodify(cur_dir, ':h')
-  endwhile
-
-  return 0
-endfunction
-
-
-function! s:is_tracked() abort
-  call system(printf('git ls-files --error-unmatch "%s"', expand('%')))
-  return !v:shell_error
-endfunction
-
 
 function! s:get_diff_lines() abort
   if &readonly || !&modifiable || !empty(&buftype)
@@ -38,9 +14,7 @@ function! s:get_diff_lines() abort
     return [[1, line('$')]]
   endif
 
-  if executable('git') && s:is_git_repo() && s:is_tracked()
-    let cmd = 'git diff -U0 --no-ext-diff HEAD:"%s" "%s"'
-  elseif executable('diff')
+  if executable('diff')
     let cmd = 'diff -U0 "%s" "%s"'
   else
     return []
