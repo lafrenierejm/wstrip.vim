@@ -6,7 +6,6 @@ else
   highlight default WStripTrailing ctermbg=red guibg=red
 endif
 
-
 augroup wstrip
   autocmd BufWritePre * call wstrip#auto()
   autocmd Syntax * call wstrip#syntax()
