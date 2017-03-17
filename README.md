@@ -6,12 +6,9 @@ StackExchange's [Vi and Vim][1] website.
 
 ## Summary
 
-This plugin uses `git-diff` to strip whitespace from lines that you changed
+This plugin uses `diff` to strip whitespace from lines that you changed
 while editing.  This allows you to keep newly added lines clean without
 affecting the history of existing lines.
-
-If the file is not in a `git` repository, `diff` is used to make a simple
-comparison against the existing file on disk.
 
 
 ## Usage
