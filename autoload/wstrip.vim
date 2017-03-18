@@ -32,34 +32,33 @@ function! s:get_diff_lines() abort
   let l:difflines = split(system(printf(l:diffcmd, l:buf_file, l:tmpfile)), "\n")
   call delete(l:tmpfile)
 
-  " handle the case where executing l:diffcmd returns an error
-  if v:shell_error
-    return [[1, line('$')]]
-  endif
-
+  " l:groups is the array of line numbers to return
   let l:groups = []
 
-  for l:line in l:difflines
-    if l:line !~# '^@@'
-      continue
-    endif
-
-    " only added lines are of interest;
-    " changed lines show as both deletion *and* addition
-    let l:added = matchstr(l:line, '+\zs[0-9,]\+')
-    if l:added =~# ','
-      let l:parts = map(split(l:added, ','), 'str2nr(v:val)')
-      if !l:parts[1]
+  " only run if diff returns 1 (success, files different)
+  if (v:shell_error == 1)
+    for l:line in l:difflines
+      if l:line !~# '^@@'
         continue
       endif
-      let l:start_line = l:parts[0]
-      let l:end_line = l:parts[0] + (l:parts[1] - 1)
-    else
-      let l:start_line = str2nr(l:added)
-      let l:end_line = l:start_line
-    endif
-    call add(l:groups, [l:start_line, l:end_line])
-  endfor
+
+      " only added lines are of interest;
+      " changed lines show as deletion and addition
+      let l:added = matchstr(l:line, '+\zs[0-9,]\+')
+      if l:added =~# ','
+        let l:parts = map(split(l:added, ','), 'str2nr(v:val)')
+        if !l:parts[1]
+          continue
+        endif
+        let l:start_line = l:parts[0]
+        let l:end_line = l:parts[0] + (l:parts[1] - 1)
+      else
+        let l:start_line = str2nr(l:added)
+        let l:end_line = l:start_line
+      endif
+      call add(l:groups, [l:start_line, l:end_line])
+    endfor
+  endif
 
   return l:groups
 endfunction
