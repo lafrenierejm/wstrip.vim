@@ -27,7 +27,12 @@ function! s:get_diff_lines() abort
   "" Create a new file named <buffer_path>/.wstrip.<buffer_name>
   let l:tmpfile = printf('%s/.wstrip.%s', fnamemodify(l:buf_file, ':h'),
         \ fnamemodify(l:buf_file, ':t'))
-  call writefile(getline(1, '$'), l:tmpfile)
+  let lines = getline(1, '$')
+  "" If file uses DOS <EOL> then append '\r' to the end of each line.
+  if &fileformat ==# 'dos'
+    call map(lines, 'v:val . "\r"')
+  endif
+  call writefile(lines, tmpfile)
   "" store the results of the diff in l:difflines
   let l:difflines = split(system(printf(l:diffcmd, l:buf_file, l:tmpfile)), "\n")
   call delete(l:tmpfile)
